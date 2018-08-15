@@ -1,31 +1,80 @@
-var totalItems = 0;
+function renameItem(){
+    //this === span
+    var newText = prompt("what should this item be renamed to?");
+    if(!newText || newText === "" || newText === " ") return false; // blank 방지
+    var spanId = this.id.replace('pencilIcon_', '');
+    var span = document.getElementById('item_' + spanId);
 
-function updateItemStatus() {
-    var chId = this.id.replace('cb_', "");
-    var itemText = document.getElementById('item_' + chId);
+    span.innerText = newText;
+}
 
-    if (this.checked) {
-        itemText.className = 'checked';
+var donelist = document.getElementById('donelist');
+function moveItem(){
+    //this === span
+    var listItemId = this.id.replace('li_', '');
+    var listItem = document.getElementById('li_' + listItemId);
+    var listItemParentId = listItem.parentElement;
+    //console.log(listItemParentId);
+    if(listItemParentId == donelist){
+        todolist.appendChild(listItem);
     } else {
-        itemText.className = "";
+        donelist.appendChild(listItem);
     }
 }
 
-function addNewItem(list, itemText) {
-    totalItems++;
+function deleteItem(donelist){
+    //this === minusIcon
+    var listItemId = this.id.replace('minusIcon_', '');
+    document.getElementById('li_' + listItemId).style.display = "none";
+}
+
+function mouseover(){
+    //this === li
+    var pencilIconId = this.id.replace('li_','');
+    var pencilIcon = document.getElementById('pencilIcon_' + pencilIconId);
+    var minusIcon = document.getElementById('minusIcon_' + pencilIconId);
+
+    pencilIcon.style.visibility = 'visible';
+    minusIcon.style.visibility = 'visible';
+}
+
+function mouseout(){
+    //this === li
+    var pencilIconId = this.id.replace('li_','');
+    var pencilIcon = document.getElementById('pencilIcon_' + pencilIconId);
+    var minusIcon = document.getElementById('minusIcon_' + pencilIconId);
+
+    pencilIcon.style.visibility = 'hidden';
+    minusIcon.style.visibility = 'hidden';
+}
+
+function addNewItem(list, itemText){
+    var date = new Date();
+    var id = "" + date.getHours() + date.getMinutes() + date.getSeconds() + date.getMilliseconds();
 
     var listItem = document.createElement('li');
-    var checkBox = document.createElement('input');
-    checkBox.type = 'checkBox';
-    checkBox.id = 'cb_' + totalItems;
-    checkBox.onclick = updateItemStatus;
+    listItem.id = 'li_' + id;
+    listItem.ondblclick = moveItem;
+    listItem.addEventListener('mouseover', mouseover);
+    listItem.addEventListener('mouseout', mouseout);
 
     var span = document.createElement('span');
-    span.id = 'item_' + totalItems;
+    span.id = 'item_' + id;
     span.innerText = itemText;
 
-    listItem.appendChild(checkBox);
+    var pencilIcon = document.createElement('i');
+    pencilIcon.className = 'fa fa-pencil';
+    pencilIcon.id = 'pencilIcon_' + id;
+    pencilIcon.onclick = renameItem;
+
+    var minusIcon = document.createElement('i');
+    minusIcon.className = 'fa fa-times-circle-o';
+    minusIcon.id = 'minusIcon_' + id;
+    minusIcon.onclick = deleteItem;
+
     listItem.appendChild(span);
+    listItem.appendChild(minusIcon);
+    listItem.appendChild(pencilIcon);
     list.appendChild(listItem);
 }
 
@@ -36,7 +85,7 @@ inputText.onkeyup = function(event){
     //Event.which (13) === ENTER Key!!
     if(event.which === 13){
         var itemText = inputText.value;
-        if(!itemText || itemText === "" || itemText === " ") return false; // blank 방지
+        if(itemText === "" || itemText === " ") return false; // blank 방지
         addNewItem(document.getElementById('todolist'), itemText);
         inputText.focus();
         inputText.select();
